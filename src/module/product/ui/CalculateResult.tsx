@@ -1,20 +1,29 @@
 import type { SavingsProduct } from 'entities/products/types';
 import ProductCalculate from 'features/product/ui/ProductCalculate';
+import RecommendProduct from 'features/product/ui/RecommendProduct';
 import { Fragment } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { Border, colors, ListHeader, ListRow, Spacing } from 'tosslib';
+import { Border, ListRow, Spacing } from 'tosslib';
 
 interface CalculateResultProps {
   targetAmount: number;
   monthlyPayment: number;
   selectedTerm: number;
   selectedProduct: SavingsProduct | null;
+  products: SavingsProduct[];
 }
 
-const CalculateResult = ({ targetAmount, monthlyPayment, selectedTerm, selectedProduct }: CalculateResultProps) => {
+const CalculateResult = ({
+  targetAmount,
+  monthlyPayment,
+  selectedTerm,
+  selectedProduct,
+  products,
+}: CalculateResultProps) => {
   return (
     <Fragment>
       <Spacing size={8} />
+
       <ErrorBoundary
         FallbackComponent={() => <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />}
       >
@@ -30,37 +39,7 @@ const CalculateResult = ({ targetAmount, monthlyPayment, selectedTerm, selectedP
       <Border height={16} />
       <Spacing size={8} />
 
-      <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
-      <Spacing size={12} />
-
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="3RowTypeA"
-            top={'기본 정기적금'}
-            topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-            middle={`연 이자율: 3.2%`}
-            middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-            bottom={`100,000원 ~ 500,000원 | 12개월`}
-            bottomProps={{ fontSize: 13, color: colors.grey600 }}
-          />
-        }
-        onClick={() => {}}
-      />
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="3RowTypeA"
-            top={'고급 정기적금'}
-            topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-            middle={`연 이자율: 2.8%`}
-            middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-            bottom={`50,000원 ~ 1,000,000원 | 24개월`}
-            bottomProps={{ fontSize: 13, color: colors.grey600 }}
-          />
-        }
-        onClick={() => {}}
-      />
+      <RecommendProduct products={products} selectedProduct={selectedProduct} />
 
       <Spacing size={40} />
     </Fragment>

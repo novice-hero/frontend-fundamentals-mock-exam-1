@@ -5,11 +5,16 @@ import { Assets, colors, ListRow, Text } from 'tosslib';
 
 interface ProductListProps {
   products: SavingsProduct[];
+  isProductsLoading: boolean;
   selectedProduct: SavingsProduct | null;
   onSelectProduct: (product: SavingsProduct) => void;
 }
 
-const ProductList = ({ products, selectedProduct, onSelectProduct }: ProductListProps) => {
+const ProductList = ({ products, isProductsLoading, selectedProduct, onSelectProduct }: ProductListProps) => {
+  if (isProductsLoading) {
+    return <Text>적금 상품을 불러오는 중입니다...</Text>;
+  }
+
   if (!products || products.length === 0) {
     return <Text>적금 상품을 찾을 수 없어요. 월 납입액과 저축 기간을 다시 확인해주세요.</Text>;
   }

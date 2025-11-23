@@ -3,8 +3,8 @@ import useGetSavingProducts from 'entities/products/queries/useGetSavingProducts
 import type { SavingsProduct } from 'entities/products/types';
 import ProductList from 'features/product/ui/ProductList';
 import CalculateResult from 'module/product/ui/CalculateResult';
-import { Suspense, useState } from 'react';
-import { Border, NavigationBar, SelectBottomSheet, Spacing, Tab, Text, TextField } from 'tosslib';
+import { useState } from 'react';
+import { Border, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 
 export function SavingsCalculatorPage() {
   const [tab, setTab] = useState<string>('products');
@@ -14,16 +14,16 @@ export function SavingsCalculatorPage() {
   const [selectedTerm, setSelectedTerm] = useState<number>(12);
   const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
 
-  const { data: savingsProducts } = useGetSavingProducts();
+  const { data: savingsProducts, isLoading: isProductsLoading } = useGetSavingProducts({
+    enabled: targetAmount > 0 && monthlyPayment > 0 && selectedTerm > 0,
+  });
 
   const checkMonthlyPaymentRange = (product: SavingsProduct) => {
     return product.minMonthlyAmount <= monthlyPayment && product.maxMonthlyAmount >= monthlyPayment;
   };
-
   const checkAvailableTerms = (product: SavingsProduct) => {
     return product.availableTerms === selectedTerm;
   };
-
   const filteredProducts = savingsProducts?.filter(
     product => checkMonthlyPaymentRange(product) && checkAvailableTerms(product)
   );
@@ -101,13 +101,16 @@ export function SavingsCalculatorPage() {
       </Tab>
 
       {tab === 'products' && (
-        <Suspense fallback={<Text>적금 상품을 불러오는 중입니다...</Text>}>
-          <ProductList products={filteredProducts} selectedProduct={selectedProduct} onSelectProduct={selectProduct} />
-        </Suspense>
+        <ProductList
+          products={filteredProducts ?? []}
+          isProductsLoading={isProductsLoading}
+          selectedProduct={selectedProduct}
+          onSelectProduct={selectProduct}
+        />
       )}
       {tab === 'results' && (
         <CalculateResult
-          products={filteredProducts}
+          products={filteredProducts ?? []}
           targetAmount={targetAmount}
           monthlyPayment={monthlyPayment}
           selectedTerm={selectedTerm}

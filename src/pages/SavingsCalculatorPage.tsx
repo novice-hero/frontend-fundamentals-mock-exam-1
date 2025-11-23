@@ -1,9 +1,9 @@
 import { changeCommaizedNumber, checkNumber, commaizeNumber } from 'common/utils';
 import type { SavingsProduct } from 'entities/products/types';
-import CalculateResult from 'module/product/ui/CalculateResult';
 import ProductList from 'features/product/ui/ProductList';
-import { useState } from 'react';
-import { Border, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
+import CalculateResult from 'module/product/ui/CalculateResult';
+import { Suspense, useState } from 'react';
+import { Border, NavigationBar, SelectBottomSheet, Spacing, Tab, Text, TextField } from 'tosslib';
 
 export function SavingsCalculatorPage() {
   const [tab, setTab] = useState<string>('products');
@@ -86,12 +86,14 @@ export function SavingsCalculatorPage() {
       </Tab>
 
       {tab === 'products' && (
-        <ProductList
-          monthlyPayment={monthlyPayment}
-          selectedTerm={selectedTerm}
-          selectedProduct={selectedProduct}
-          onSelectProduct={selectProduct}
-        />
+        <Suspense fallback={<Text>적금 상품을 불러오는 중입니다...</Text>}>
+          <ProductList
+            monthlyPayment={monthlyPayment}
+            selectedTerm={selectedTerm}
+            selectedProduct={selectedProduct}
+            onSelectProduct={selectProduct}
+          />
+        </Suspense>
       )}
       {tab === 'results' && (
         <CalculateResult

@@ -12,7 +12,7 @@ interface ProductListProps {
 }
 
 const ProductList = ({ monthlyPayment, selectedTerm, selectedProduct, onSelectProduct }: ProductListProps) => {
-  const { savingsProducts, isLoading, error } = useGetSavingProducts();
+  const { data: savingsProducts, error } = useGetSavingProducts();
 
   const checkMonthlyPaymentRange = (product: SavingsProduct) => {
     return product.minMonthlyAmount <= monthlyPayment && product.maxMonthlyAmount >= monthlyPayment;
@@ -22,11 +22,11 @@ const ProductList = ({ monthlyPayment, selectedTerm, selectedProduct, onSelectPr
     return product.availableTerms === selectedTerm;
   };
 
-  const filteredProducts = savingsProducts.filter(
+  const filteredProducts = savingsProducts?.filter(
     product => checkMonthlyPaymentRange(product) && checkAvailableTerms(product)
   );
 
-  if (filteredProducts.length === 0) {
+  if (filteredProducts?.length === 0) {
     return <Text>적금 상품을 찾을 수 없어요. 월 납입액과 저축 기간을 다시 확인해주세요.</Text>;
   }
 
@@ -36,7 +36,7 @@ const ProductList = ({ monthlyPayment, selectedTerm, selectedProduct, onSelectPr
 
   return (
     <Fragment>
-      {filteredProducts.map(product => (
+      {filteredProducts?.map(product => (
         <ListRow
           key={product.id}
           contents={

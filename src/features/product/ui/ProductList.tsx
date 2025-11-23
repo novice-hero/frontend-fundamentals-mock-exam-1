@@ -1,42 +1,22 @@
 import { commaizeNumber } from 'common/utils';
-import useGetSavingProducts from 'entities/products/queries/useGetSavingProducts';
 import type { SavingsProduct } from 'entities/products/types';
 import { Fragment } from 'react';
 import { Assets, colors, ListRow, Text } from 'tosslib';
 
 interface ProductListProps {
-  monthlyPayment: number;
-  selectedTerm: number;
+  products: SavingsProduct[];
   selectedProduct: SavingsProduct | null;
   onSelectProduct: (product: SavingsProduct) => void;
 }
 
-const ProductList = ({ monthlyPayment, selectedTerm, selectedProduct, onSelectProduct }: ProductListProps) => {
-  const { data: savingsProducts, error } = useGetSavingProducts();
-
-  const checkMonthlyPaymentRange = (product: SavingsProduct) => {
-    return product.minMonthlyAmount <= monthlyPayment && product.maxMonthlyAmount >= monthlyPayment;
-  };
-
-  const checkAvailableTerms = (product: SavingsProduct) => {
-    return product.availableTerms === selectedTerm;
-  };
-
-  const filteredProducts = savingsProducts?.filter(
-    product => checkMonthlyPaymentRange(product) && checkAvailableTerms(product)
-  );
-
-  if (filteredProducts?.length === 0) {
+const ProductList = ({ products, selectedProduct, onSelectProduct }: ProductListProps) => {
+  if (!products || products.length === 0) {
     return <Text>적금 상품을 찾을 수 없어요. 월 납입액과 저축 기간을 다시 확인해주세요.</Text>;
-  }
-
-  if (error) {
-    return <Text>정보를 불러오는 데 실패했어요. 잠시 후 다시 시도해주세요.</Text>;
   }
 
   return (
     <Fragment>
-      {filteredProducts?.map(product => (
+      {products?.map(product => (
         <ListRow
           key={product.id}
           contents={

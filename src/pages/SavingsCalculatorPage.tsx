@@ -1,4 +1,5 @@
 import { changeCommaizedNumber, checkNumber, commaizeNumber } from 'common/utils';
+import useGetSavingProducts from 'entities/products/queries/useGetSavingProducts';
 import type { SavingsProduct } from 'entities/products/types';
 import ProductList from 'features/product/ui/ProductList';
 import CalculateResult from 'module/product/ui/CalculateResult';
@@ -8,10 +9,24 @@ import { Border, NavigationBar, SelectBottomSheet, Spacing, Tab, Text, TextField
 export function SavingsCalculatorPage() {
   const [tab, setTab] = useState<string>('products');
 
-  const [targetAmount, setTargetAmount] = useState<number>(1000000);
-  const [monthlyPayment, setMonthlyPayment] = useState<number>(50000);
+  const [targetAmount, setTargetAmount] = useState<number>(0);
+  const [monthlyPayment, setMonthlyPayment] = useState<number>(0);
   const [selectedTerm, setSelectedTerm] = useState<number>(12);
   const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
+
+  const { data: savingsProducts } = useGetSavingProducts();
+
+  const checkMonthlyPaymentRange = (product: SavingsProduct) => {
+    return product.minMonthlyAmount <= monthlyPayment && product.maxMonthlyAmount >= monthlyPayment;
+  };
+
+  const checkAvailableTerms = (product: SavingsProduct) => {
+    return product.availableTerms === selectedTerm;
+  };
+
+  const filteredProducts = savingsProducts?.filter(
+    product => checkMonthlyPaymentRange(product) && checkAvailableTerms(product)
+  );
 
   const changeTargetAmount = (value: number) => {
     if (checkNumber(value)) {
@@ -87,16 +102,12 @@ export function SavingsCalculatorPage() {
 
       {tab === 'products' && (
         <Suspense fallback={<Text>적금 상품을 불러오는 중입니다...</Text>}>
-          <ProductList
-            monthlyPayment={monthlyPayment}
-            selectedTerm={selectedTerm}
-            selectedProduct={selectedProduct}
-            onSelectProduct={selectProduct}
-          />
+          <ProductList products={filteredProducts} selectedProduct={selectedProduct} onSelectProduct={selectProduct} />
         </Suspense>
       )}
       {tab === 'results' && (
         <CalculateResult
+          products={filteredProducts}
           targetAmount={targetAmount}
           monthlyPayment={monthlyPayment}
           selectedTerm={selectedTerm}
